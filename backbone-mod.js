@@ -72,6 +72,15 @@ var backbone_mod = function ( klass ) {
   backbone_proto.methods.defaults = backbone_proto.attrs;
 
 
+  if ( ( true && "JMMDEBUG" ) && klass.prototype.parent && klass.prototype.parent.backbone ) {
+
+    klass.prototype.parent = klass.prototype.parent.backbone.prototype;
+
+  }
+  // if
+
+
+
   if ( backbone_proto.methods.hasOwnProperty( 'constructor' ) ) {
 
     // backbone_proto.methods.initialize = backbone_proto.methods.constructor;
@@ -106,7 +115,11 @@ backbone_proto.methods.defaults = _.extend( {}, klass.prototype.parent.defaults,
 
   var base = klass.prototype.parent && klass.prototype.parent.constructor || Backbone.Model;
 
+  var old_klass = klass;
+
   klass = base.extend( backbone_proto.methods );
+
+  old_klass.prototype.backbone = klass;
 
 
   if ( backbone_proto.attrs.hasOwnProperty( 'id' ) ) {
@@ -138,7 +151,7 @@ backbone_proto.methods.defaults = _.extend( {}, klass.prototype.parent.defaults,
 
 var matches;
 
-[
+var classes = [
 
   'Game',
 
@@ -148,32 +161,29 @@ var matches;
 
   'Player_UI'
 
-].forEach( function ( value, index, array ) {
-
-  matches = /^(.+?)((?:_UI)?)$/.exec( value );
+];
 
 
-  if ( matches && matches[2].length ) {
-
-    Jeopardy[ matches[0] ].prototype.parent = Jeopardy[ matches[1] ].prototype;
-
-  }
-  // if
-
+classes.forEach( function ( value, index, array ) {
 
   Jeopardy[ value ] = backbone_mod( Jeopardy[ value ] );
 
-
-  if ( matches && matches[1] == 'Player' ) {
-
-    Jeopardy[ 'Game' + matches[2] ].prototype.defaults.player_class = Jeopardy[ matches[0] ].prototype;
-
-    Jeopardy.Game_UI.prototype.defaults.player_class = Jeopardy.Player_UI.prototype;
-
-  }
-  // if
+} );
 
 
-  matches = null;
+classes.forEach( function ( value, index, array ) {
+
+  Object.keys( Jeopardy[ value ].prototype.defaults ).forEach( function( key, inner_val, inner_array ) {
+
+    inner_val = Jeopardy[ value ].prototype.defaults[ key ];
+
+    if ( inner_val && inner_val.backbone ) {
+
+      Jeopardy[ value ].prototype.defaults[ key ] = inner_val.backbone.prototype;
+
+    }
+    // if
+
+  } );
 
 } );
