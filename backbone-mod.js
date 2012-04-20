@@ -31,7 +31,13 @@ var backbone_mod = function ( klass ) {
 
     return function () {
 
-      Backbone.Model.call( this );
+      if ( ! this.cid ) {
+
+        Backbone.Model.call( this );
+
+      }
+      // if
+
 
       klass.apply( this, arguments );
 
