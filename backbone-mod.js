@@ -7,20 +7,6 @@ var backbone_mod = function ( klass ) {
 
   var stubs = {};
 
-  stubs.get_set = function ( f ) {
-
-    return function () {
-
-      Backbone.Model.prototype[ f ].apply( this, arguments );
-
-    };
-
-  };
-
-  stubs.get = stubs.get_set( 'get' );
-
-  stubs.set = stubs.get_set( 'set' );
-
 
   stubs.get_set = function ( meth, key ) {
 
@@ -39,9 +25,6 @@ var backbone_mod = function ( klass ) {
     };
 
   };
-
-
-  // stubs.get_set = "JMMDEBUG";
 
 
   stubs.ctor = function ( klass ) {
@@ -76,18 +59,6 @@ var backbone_mod = function ( klass ) {
     else {
 
       collection = 'attrs';
-
-if ( false && "JMMDEBUG" ) {
-
-      Object.defineProperty( klass.prototype, key, {
-
-        get: stubs.get_set( 'get', key ),
-
-        set: stubs.get_set( 'set', key )
-
-      } );
-
-}
 
     }
     // else
@@ -138,9 +109,6 @@ backbone_proto.methods.defaults = _.extend( {}, klass.prototype.parent.defaults,
   klass = base.extend( backbone_proto.methods );
 
 
-
-
-
   if ( backbone_proto.attrs.hasOwnProperty( 'id' ) ) {
 
     delete backbone_proto.attrs.id;
@@ -149,12 +117,8 @@ backbone_proto.methods.defaults = _.extend( {}, klass.prototype.parent.defaults,
   // if
 
 
-// return klass;
-
   Object.keys( backbone_proto.attrs ).forEach( function ( key, index, attrs ) {
-if ( key == 'id' ) {
-  1 == 1;
-}
+
     Object.defineProperty( klass.prototype, key, {
 
       get: stubs.get_set( 'get', key ),
@@ -166,40 +130,11 @@ if ( key == 'id' ) {
   } );
 
 
-
   return klass;
 
 };
 // backbone_mod
 
-
-
-if ( false && "JMMDEBUG" ) {
-
-Jeopardy.Game = backbone_mod( Jeopardy.Game );
-
-delete Jeopardy.Game_UI.prototype.constructor;
-
-Jeopardy.Game_UI.prototype.parent = Jeopardy.Game;
-
-Jeopardy.Game_UI = backbone_mod( Jeopardy.Game_UI );
-
-var jeopardy = new Jeopardy.Game_UI;
-
-Jeopardy.Whatever = function () {};
-
-Jeopardy.Whatever.prototype.parent = Jeopardy.Game;
-
-Jeopardy.Whatever = backbone_mod( Jeopardy.Whatever );
-
-jeopardy = new Jeopardy.Whatever;
-
-1 == 1;
-
-}
-
-
-if ( true && "JMMDEBUG" ) {
 
 [
 
@@ -240,8 +175,3 @@ if ( true && "JMMDEBUG" ) {
   // else if
 
 } );
-
-}
-
-
-
