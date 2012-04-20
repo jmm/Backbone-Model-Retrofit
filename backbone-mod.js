@@ -136,6 +136,8 @@ backbone_proto.methods.defaults = _.extend( {}, klass.prototype.parent.defaults,
 // backbone_mod
 
 
+var matches;
+
 [
 
   'Game',
@@ -148,30 +150,30 @@ backbone_proto.methods.defaults = _.extend( {}, klass.prototype.parent.defaults,
 
 ].forEach( function ( value, index, array ) {
 
-  if ( value == 'Game_UI' ) {
+  matches = /^(.+?)((?:_UI)?)$/.exec( value );
 
-    Jeopardy.Game_UI.prototype.parent = Jeopardy.Game.prototype;
+
+  if ( matches && matches[2].length ) {
+
+    Jeopardy[ matches[0] ].prototype.parent = Jeopardy[ matches[1] ].prototype;
 
   }
   // if
 
 
-  else if ( value == 'Player_UI' ) {
-
-    Jeopardy.Player_UI.prototype.parent = Jeopardy.Player.prototype;
-
-  }
-  // else if
-
-
   Jeopardy[ value ] = backbone_mod( Jeopardy[ value ] );
 
 
-  if ( value == 'Player_UI' ) {
+  if ( matches && matches[1] == 'Player' ) {
+
+    Jeopardy[ 'Game' + matches[2] ].prototype.defaults.player_class = Jeopardy[ matches[0] ].prototype;
 
     Jeopardy.Game_UI.prototype.defaults.player_class = Jeopardy.Player_UI.prototype;
 
   }
-  // else if
+  // if
+
+
+  matches = null;
 
 } );
