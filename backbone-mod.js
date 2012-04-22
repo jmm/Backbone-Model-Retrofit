@@ -3,8 +3,6 @@ var backbone_mod = function ( klass ) {
 
   var backbone_proto = { 'attrs' : {}, 'methods' : {} };
 
-  var collection;
-
   var stubs = {};
 
 
@@ -46,6 +44,8 @@ var backbone_mod = function ( klass ) {
   };
 
 
+  var collection;
+
   Object.keys( klass.prototype ).forEach( function ( value, key, array ) {
 
     key = value;
@@ -78,7 +78,7 @@ var backbone_mod = function ( klass ) {
   backbone_proto.methods.defaults = backbone_proto.attrs;
 
 
-  if ( ( true && "JMMDEBUG" ) && klass.prototype.parent && klass.prototype.parent.backbone ) {
+  if ( klass.prototype.parent && klass.prototype.parent.backbone ) {
 
     klass.prototype.parent = klass.prototype.parent.backbone.prototype;
 
@@ -89,26 +89,12 @@ var backbone_mod = function ( klass ) {
 
   if ( backbone_proto.methods.hasOwnProperty( 'constructor' ) ) {
 
-    // backbone_proto.methods.initialize = backbone_proto.methods.constructor;
-
-
-
-
-backbone_proto.methods.defaults = _.extend( {}, klass.prototype.parent.defaults, backbone_proto.methods.defaults );
-
-
-
-
-    // delete backbone_proto.methods.constructor;
+    backbone_proto.methods.defaults = _.extend( {}, klass.prototype.parent.defaults, backbone_proto.methods.defaults );
 
   }
   // if
 
   else {
-
-    // backbone_proto.methods.initialize = klass;
-
-
 
     backbone_proto.methods.constructor = klass;
 
@@ -170,25 +156,40 @@ var classes = [
 ];
 
 
-classes.forEach( function ( value, index, array ) {
+var mutators = [
 
-  Jeopardy[ value ] = backbone_mod( Jeopardy[ value ] );
+  function ( klass ) {
 
-} );
+    Jeopardy[ klass ] = backbone_mod( Jeopardy[ klass ] );
+
+  },
 
 
-classes.forEach( function ( value, index, array ) {
+  function ( klass ) {
 
-  Object.keys( Jeopardy[ value ].prototype.defaults ).forEach( function( key, inner_val, inner_array ) {
+    Object.keys( Jeopardy[ klass ].prototype.defaults ).forEach( function( key, prop ) {
 
-    inner_val = Jeopardy[ value ].prototype.defaults[ key ];
+      prop = Jeopardy[ klass ].prototype.defaults[ key ];
 
-    if ( inner_val && inner_val.backbone ) {
+      if ( prop && prop.backbone ) {
 
-      Jeopardy[ value ].prototype.defaults[ key ] = inner_val.backbone.prototype;
+        Jeopardy[ klass ].prototype.defaults[ key ] = prop.backbone.prototype;
 
-    }
-    // if
+      }
+      // if
+
+    } );
+
+  }
+
+];
+
+
+mutators.forEach( function ( mutator ) {
+
+  classes.forEach( function ( klass ) {
+
+    mutator( klass );
 
   } );
 
