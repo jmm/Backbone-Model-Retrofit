@@ -1,5 +1,51 @@
+var Backbone_Mod = {};
 
-var backbone_mod = function ( klass ) {
+
+Backbone_Mod.mod_classes = function ( container, klasses ) {
+
+  var mutators = [
+
+    function ( container, klass ) {
+
+      container[ klass ] = Backbone_Mod.mod_class( container[ klass ] );
+
+    },
+
+
+    function ( container, klass ) {
+
+      Object.keys( container[ klass ].prototype.defaults ).forEach( function( key, prop ) {
+
+        prop = container[ klass ].prototype.defaults[ key ];
+
+        if ( prop && prop.backbone ) {
+
+          container[ klass ].prototype.defaults[ key ] = prop.backbone.prototype;
+
+        }
+        // if
+
+      } );
+
+    }
+
+  ];
+
+
+  mutators.forEach( function ( mutator ) {
+
+    klasses.forEach( function ( klass ) {
+
+      mutator( container, klass );
+
+    } );
+
+  } );
+
+};
+
+
+Backbone_Mod.mod_class = function ( klass ) {
 
   var backbone_proto = { 'attrs' : {}, 'methods' : {} };
 
@@ -138,59 +184,4 @@ var backbone_mod = function ( klass ) {
   return klass;
 
 };
-// backbone_mod
-
-
-var matches;
-
-var classes = [
-
-  'Game',
-
-  'Game_UI',
-
-  'Player',
-
-  'Player_UI'
-
-];
-
-
-var mutators = [
-
-  function ( klass ) {
-
-    Jeopardy[ klass ] = backbone_mod( Jeopardy[ klass ] );
-
-  },
-
-
-  function ( klass ) {
-
-    Object.keys( Jeopardy[ klass ].prototype.defaults ).forEach( function( key, prop ) {
-
-      prop = Jeopardy[ klass ].prototype.defaults[ key ];
-
-      if ( prop && prop.backbone ) {
-
-        Jeopardy[ klass ].prototype.defaults[ key ] = prop.backbone.prototype;
-
-      }
-      // if
-
-    } );
-
-  }
-
-];
-
-
-mutators.forEach( function ( mutator ) {
-
-  classes.forEach( function ( klass ) {
-
-    mutator( klass );
-
-  } );
-
-} );
+// mod_class
