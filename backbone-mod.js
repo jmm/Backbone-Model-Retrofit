@@ -77,7 +77,7 @@ Backbone_Mod.mod_class = function ( klass ) {
 
       if ( ! this.cid ) {
 
-        Backbone.Model.call( this );
+        Backbone.Model.apply( this, arguments );
 
       }
       // if
