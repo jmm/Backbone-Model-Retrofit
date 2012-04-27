@@ -133,25 +133,43 @@ Backbone_Mod.mod_class = function ( klass ) {
 
 
 
-  if ( backbone_proto.methods.hasOwnProperty( 'constructor' ) ) {
+  if ( klass.prototype.hasOwnProperty( 'constructor' ) ) {
 
-    backbone_proto.methods.defaults = _.extend( {}, klass.prototype.parent.defaults, backbone_proto.methods.defaults );
+    backbone_proto.methods.initialize = klass.prototype.constructor;
+
+    if ( klass.prototype.parent && klass.prototype.parent.defaults ) {
+
+      backbone_proto.methods.defaults = _.extend(
+
+        {},
+
+        klass.prototype.parent.defaults,
+
+        backbone_proto.methods.defaults
+
+      );
+
+    }
+    // if
 
   }
   // if
 
-  else {
-
-    backbone_proto.methods.constructor = klass;
-
-  }
-  // else
 
 
+if ( false && "JMMDEBUG" ) {
   backbone_proto.methods.constructor = stubs.ctor( backbone_proto.methods.constructor );
 
 
   var base = klass.prototype.parent && klass.prototype.parent.constructor || Backbone.Model;
+
+}
+
+if ( true && "JMMDEBUG" ) {
+
+  var base = Backbone.Model;
+
+}
 
   var old_klass = klass;
 
