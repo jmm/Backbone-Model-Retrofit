@@ -190,9 +190,9 @@ if ( true && "JMMDEBUG" ) {
 
     Object.defineProperty( klass.prototype, key, {
 
-      get: stubs.get_set( 'get', key ),
+      get : stubs.get_set( 'get', key ),
 
-      set: stubs.get_set( 'set', key )
+      set : stubs.get_set( 'set', key )
 
     } );
 
