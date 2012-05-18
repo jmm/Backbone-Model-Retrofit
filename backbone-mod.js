@@ -101,21 +101,6 @@ Backbone_Mod.mod_class = function ( klass ) {
     collection = value instanceof Function ? 'methods' : 'attrs';
 
 
-    if ( value instanceof Function ) {
-
-      collection = 'methods';
-
-    }
-    // if
-
-    else {
-
-      collection = 'attrs';
-
-    }
-    // else
-
-
     backbone_proto[ collection ][ key ] = value;
 
   } );
