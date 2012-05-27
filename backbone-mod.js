@@ -58,7 +58,7 @@ Backbone_Mod.mod_class = function ( klass ) {
 
     return function () {
 
-      return Backbone.Model.prototype[ meth ].apply(
+      return Backbone.DeepModel.prototype[ meth ].apply(
 
         this,
 
@@ -77,7 +77,7 @@ Backbone_Mod.mod_class = function ( klass ) {
 
       if ( ! this.cid ) {
 
-        Backbone.Model.apply( this, arguments );
+        Backbone.DeepModel.apply( this, arguments );
 
       }
       // if
@@ -152,7 +152,7 @@ if ( false && "JMMDEBUG" ) {
 
 if ( true && "JMMDEBUG" ) {
 
-  var base = Backbone.Model;
+  var base = Backbone.DeepModel;
 
 }
 
