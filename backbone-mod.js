@@ -1,13 +1,13 @@
 var Backbone_Mod = {};
 
 
-Backbone_Mod.mod_classes = function ( container, klasses ) {
+Backbone_Mod.mod_classes = function ( container, klasses, base ) {
 
   var mutators = [
 
     function ( container, klass ) {
 
-      container[ klass ] = Backbone_Mod.mod_class( container[ klass ] );
+      container[ klass ] = Backbone_Mod.mod_class( container[ klass ], base );
 
     },
 
@@ -45,7 +45,7 @@ Backbone_Mod.mod_classes = function ( container, klasses ) {
 };
 
 
-Backbone_Mod.mod_class = function ( klass ) {
+Backbone_Mod.mod_class = function ( klass, base ) {
 
   var backbone_proto = { 'attrs' : {}, 'methods' : {} };
 
@@ -58,7 +58,7 @@ Backbone_Mod.mod_class = function ( klass ) {
 
     return function () {
 
-      return Backbone.DeepModel.prototype[ meth ].apply(
+      return base.prototype[ meth ].apply(
 
         this,
 
@@ -77,7 +77,7 @@ Backbone_Mod.mod_class = function ( klass ) {
 
       if ( ! this.cid ) {
 
-        Backbone.DeepModel.apply( this, arguments );
+        base.apply( this, arguments );
 
       }
       // if
@@ -140,21 +140,6 @@ Backbone_Mod.mod_class = function ( klass ) {
   }
   // if
 
-
-
-if ( false && "JMMDEBUG" ) {
-  backbone_proto.methods.constructor = stubs.ctor( backbone_proto.methods.constructor );
-
-
-  var base = klass.prototype.parent && klass.prototype.parent.constructor || Backbone.Model;
-
-}
-
-if ( true && "JMMDEBUG" ) {
-
-  var base = Backbone.DeepModel;
-
-}
 
   var old_klass = klass;
 
