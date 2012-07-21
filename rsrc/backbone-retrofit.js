@@ -59,7 +59,9 @@ Backbone_Retrofit.mod_classes = function ( container, klasses, base ) {
 
           if ( prop && prop.backbone ) {
 
-            container[ klass ].prototype.defaults[ key ] = prop.backbone.prototype;
+            container[ klass ].prototype.defaults[ key ] =
+
+              prop.backbone.prototype;
 
           }
           // if
