@@ -2,7 +2,7 @@
  * Retrofit legacy code to function as Backbone.Model subclasses.
  */
 
-var Backbone_Retrofit = {};
+var Backbone_Model_Retrofit = {};
 
 
 /**
@@ -17,7 +17,7 @@ var Backbone_Retrofit = {};
  * @return void
  */
 
-Backbone_Retrofit.retrofit_classes = function ( container, klasses, base ) {
+Backbone_Model_Retrofit.retrofit_classes = function ( container, klasses, base ) {
 
   // Retrofitter functions to run on legacy classes.
 
@@ -59,7 +59,7 @@ Backbone_Retrofit.retrofit_classes = function ( container, klasses, base ) {
  * @return object Modified klass.
  */
 
-Backbone_Retrofit.retrofit_class = function ( container, klass, base ) {
+Backbone_Model_Retrofit.retrofit_class = function ( container, klass, base ) {
 
   var klass_name = klass;
 
@@ -162,9 +162,9 @@ Backbone_Retrofit.retrofit_class = function ( container, klass, base ) {
 
     Object.defineProperty( klass.prototype, key, {
 
-      get : Backbone_Retrofit.get_set( base, 'get', key ),
+      get : Backbone_Model_Retrofit.get_set( base, 'get', key ),
 
-      set : Backbone_Retrofit.get_set( base, 'set', key )
+      set : Backbone_Model_Retrofit.get_set( base, 'set', key )
 
     } );
 
@@ -192,7 +192,7 @@ Backbone_Retrofit.retrofit_class = function ( container, klass, base ) {
  * @return void
  */
 
-Backbone_Retrofit.resync_protos = function ( container, klass ) {
+Backbone_Model_Retrofit.resync_protos = function ( container, klass ) {
 
   klass = container[ klass ];
 
@@ -233,7 +233,7 @@ Backbone_Retrofit.resync_protos = function ( container, klass ) {
  * @return function getter|setter
  */
 
-Backbone_Retrofit.get_set = function ( base, meth, key ) {
+Backbone_Model_Retrofit.get_set = function ( base, meth, key ) {
 
   // Capture `key`
 
