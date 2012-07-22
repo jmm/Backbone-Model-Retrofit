@@ -17,82 +17,40 @@ var Backbone_Retrofit = {};
  * @return void
  */
 
-Backbone_Retrofit.mod_classes = function ( container, klasses, base ) {
+Backbone_Retrofit.retrofit_classes = function ( container, klasses, base ) {
 
-  // Mutation functions to run on legacy classes.
+  // Retrofitter functions to run on legacy classes.
 
-  var mutators = [
+  var retrofitters = [
 
-    /**
-     * Assign return value of mod_class() to the original class's slot in
-     * container.
-     *
-     * @param object container Container for classes being modified.
-     *
-     * @param object klass Name of class within container to modify.
-     *
-     * @return void
-     */
+    this.retrofit_class,
 
-    function ( container, klass ) {
-
-      container[ klass ] = Backbone_Retrofit.mod_class(
-
-        container[ klass ], base
-
-      );
-
-    },
-
-
-    /**
-     * JMMDEBUG
-     */
-
-    function ( container, klass ) {
-
-      Object.keys( container[ klass ].prototype.defaults ).forEach(
-
-        function( key, prop ) {
-
-          prop = container[ klass ].prototype.defaults[ key ];
-
-          if ( prop && prop.backbone ) {
-
-            container[ klass ].prototype.defaults[ key ] =
-
-              prop.backbone.prototype;
-
-          }
-          // if
-
-        }
-
-      );
-      // forEach
-
-    }
+    this.resync_protos
 
   ];
+  // retrofitters
 
 
-  // Run each mutator fucntion for each input class.
+  // Run each retrofitter function for each input class.
 
-  mutators.forEach( function ( mutator ) {
+  retrofitters.forEach( function ( retrofitter ) {
 
     klasses.forEach( function ( klass ) {
 
-      mutator( container, klass );
+      retrofitter( container, klass, base );
 
     } );
 
   } );
 
 };
+// retrofit_classes
 
 
 /**
  * Modify a legacy class to serve as a Backbone.Model subclass.
+ *
+ * @param object container Container for classes being modified.
  *
  * @param object klass Legacy class.
  *
@@ -101,7 +59,12 @@ Backbone_Retrofit.mod_classes = function ( container, klasses, base ) {
  * @return object Modified klass.
  */
 
-Backbone_Retrofit.mod_class = function ( klass, base ) {
+Backbone_Retrofit.retrofit_class = function ( container, klass, base ) {
+
+  var klass_name = klass;
+
+  klass = container[ klass ];
+
 
   // Separate attrs and methods.
 
@@ -131,18 +94,21 @@ Backbone_Retrofit.mod_class = function ( klass, base ) {
   } );
 
 
-  if ( klass.prototype.parent && klass.prototype.parent.backbone ) {
+  // If klass has a parent property that refers to a class that has been
+  // retrofitted for Backbone, update the property to refer to the retrofitted
+  // class.
 
-    klass.prototype.parent = klass.prototype.parent.backbone.prototype;
+  if ( klass.prototype.parent && klass.prototype.parent.__backbone__ ) {
+
+    klass.prototype.parent = klass.prototype.parent.__backbone__.prototype;
 
   }
   // if
 
 
-
   if ( klass.prototype.hasOwnProperty( 'constructor' ) ) {
 
-    // Copy legacy class constructor to Backbone.Model.initialize.
+    // Copy legacy class constructor to `initialize`.
 
     backbone_proto.initialize = klass.prototype.constructor;
 
@@ -170,7 +136,9 @@ Backbone_Retrofit.mod_class = function ( klass, base ) {
 
   klass = base.extend( backbone_proto );
 
-  old_klass.prototype.backbone = klass;
+  // Store a reference to the Backbone-retrofitted class in the original class.
+
+  old_klass.prototype.__backbone__ = klass;
 
 
   // Properties that may be used in legacy classes and are special-cased by
@@ -194,19 +162,65 @@ Backbone_Retrofit.mod_class = function ( klass, base ) {
 
     Object.defineProperty( klass.prototype, key, {
 
-      get : Backbone_Retrofit.get_set( 'get', key ),
+      get : Backbone_Retrofit.get_set( base, 'get', key ),
 
-      set : Backbone_Retrofit.get_set( 'set', key )
+      set : Backbone_Retrofit.get_set( base, 'set', key )
 
     } );
 
   } );
 
 
-  return klass;
+  container[ klass_name ] = klass;
 
 };
-// mod_class
+// retrofit_class
+
+
+/**
+ * Adapt retrofitted classes to retrofitting of other classes.
+ *
+ * Now that all original classes have been retrofitted, process them again
+ * to find props from their prototypes (now in prototype.defaults due to
+ * retrofitting) that contain classes that have themselves been retrofitted.
+ * Update the property to refer to the retrofitted version of the class.
+ *
+ * @param obj container Container for klasses being modified.
+ *
+ * @param obj klass Name of class within container to modify.
+ *
+ * @return void
+ */
+
+Backbone_Retrofit.resync_protos = function ( container, klass ) {
+
+  klass = container[ klass ];
+
+  Object.keys( klass.prototype.defaults ).forEach(
+
+    function( key, prop ) {
+
+      prop = klass.prototype.defaults[ key ];
+
+      // The class has been retrofitted, and a reference to the retrofitted
+      // version stored in `__backbone__`.
+
+      if ( prop && prop.__backbone__ ) {
+
+        klass.prototype.defaults[ key ] =
+
+          prop.__backbone__.prototype;
+
+      }
+      // if
+
+    }
+
+  );
+  // forEach
+
+};
+// resync_protos
 
 
 /**
@@ -219,9 +233,11 @@ Backbone_Retrofit.mod_class = function ( klass, base ) {
  * @return function getter|setter
  */
 
-Backbone_Retrofit.get_set = function ( meth, key ) {
+Backbone_Retrofit.get_set = function ( base, meth, key ) {
 
-  var args = Array.prototype.slice.call( arguments, 1 );
+  // Capture `key`
+
+  var args = Array.prototype.slice.call( arguments, 2 );
 
   return function () {
 
