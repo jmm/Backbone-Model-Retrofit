@@ -1,5 +1,5 @@
 /**
- * Retrofit legacy code to function as Backbone.Model subclasses.
+ * Retrofit legacy classes to function as Backbone.Model classes.
  */
 
 var Backbone_Model_Retrofit = {};
