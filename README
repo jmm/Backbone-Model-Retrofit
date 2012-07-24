@@ -1,0 +1,29 @@
+A moderately successful experiment in retrofitting (dynamically, at runtime)
+classes that I wrote as straight JS (with some jQuery utility methods) so that
+they'll function as Backbone.Model classes. Part of the point is so that I can
+keep using the original classes with the original codebase and also with the new
+Backbone codebase.
+
+The gist of it is that it copies the methods and properties (which will become
+the Backbone model attributes) from the legacy class to a new object which is
+passed to Backbone.Model.extend().  For the attribute properties, getters /
+setters (in this case, the ES5 variety) are created, which proxy to
+Backbone.Model get() / set(). That allows standard property access in the
+original class to continue to function, while populating Backbone Model
+attributes (accessible by Backbone.Model get() / set() in the Backbone code).
+E.g.
+
+// Original class
+
+var something = this.whatever;
+
+this.something = "whatever";
+
+
+// Backbone code
+
+this.get( 'something' ) === "whatever";
+
+
+Jesse McCarthy
+2012-07-22
